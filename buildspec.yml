@@ -1,3 +1,4 @@
+﻿---
 version: 0.2
 
 env:
@@ -13,43 +14,45 @@ phases:
       docker: 20
       python: 3.10
     commands:
-      - echo "Upgrading tooling..."
+      - echo "Upgrading pip and tools..."
       - pip install --upgrade pip setuptools wheel pytest
 
   pre_build:
     commands:
-      - echo "Source dir is: $CODEBUILD_SRC_DIR"
+      - echo "Checking source directory..."
+      - echo "CODEBUILD_SRC_DIR=$CODEBUILD_SRC_DIR"
       - ls -la
 
   build:
     commands:
-      - echo "***RUN TESTS INSIDE GLUE DOCKER***"
-      - docker run --rm \
-          -v "$CODEBUILD_SRC_DIR":/home/glue_user/workspace \
-          "$GLUE_IMAGE" \
-          bash -c "set -euo pipefail
-                   cd /home/glue_user/workspace
-                   rm -rf *.egg-info build dist || true
-                   pip install --upgrade pip setuptools wheel pytest
-                   pip install -e .
-                   pytest -v"
-      - echo "***PACKAGE WHEEL***"
+      - echo "=== RUN TESTS INSIDE GLUE DOCKER ==="
+      - >
+        docker run --rm -v "$CODEBUILD_SRC_DIR":/home/glue_user/workspace
+        "$GLUE_IMAGE"
+        bash -c "set -euo pipefail &&
+        cd /home/glue_user/workspace &&
+        rm -rf *.egg-info build dist || true &&
+        pip install -e . &&
+        pytest -v"
+      - echo "=== PACKAGE WHEEL ==="
       - python setup.py sdist bdist_wheel
       - ls -l dist/
 
   post_build:
     commands:
-      - echo "***UPLOAD WHEEL TO S3***"
+      - echo "=== UPLOAD WHEEL TO S3 ==="
       - aws s3 cp dist/*.whl s3://$WHEEL_BUCKET/
       - |
         if [ "$AUTO_DEPLOY" = "true" ]; then
-          echo "=== UPDATE GLUE JOB TO NEW WHEEL ==="
-          WHEEL_URI=$(aws s3 ls s3://$WHEEL_BUCKET/ | awk '{print $4}' | sort | tail -n1)
+          echo "=== UPDATE GLUE JOB ==="
+          WHEEL_URI=$(aws s3 ls s3://$WHEEL_BUCKET/ | awk '{print $4}' | \
+            sort | tail -n1)
           aws glue update-job \
             --job-name "$GLUE_JOB_NAME" \
-            --job-update "{\"DefaultArguments\": {\"--extra-py-files\": \"s3://$WHEEL_BUCKET/$WHEEL_URI\"}}"
+            --job-update "{\"DefaultArguments\": {\
+            \"--extra-py-files\": \"s3://$WHEEL_BUCKET/$WHEEL_URI\"}}"
         else
-          echo "Auto deploy disabled; skipping glue update."
+          echo "Auto-deploy disabled; skipping Glue job update."
         fi
 
 artifacts:
