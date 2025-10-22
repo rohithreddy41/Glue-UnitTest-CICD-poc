@@ -1,0 +1,10 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+/aws.xml
+/Glue-UnitTest-CICD-poc.iml
+/misc.xml
+/modules.xml
+/inspectionProfiles/profiles_settings.xml
+/vcs.xml
+.idea/
