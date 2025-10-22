@@ -1,0 +1,43 @@
+1.docker pull amazon/aws-glue-libs:5
+2.docker run -it -v C:\Users\RBR00100\.aws:/home/glue_user/.aws -v WORKSPACE_LOCATION:/home/glue_user/workspace/ -e AWS_PROFILE=lower -e DISABLE_SSL=true --rm -p 4040:4040 -p 18080:18080 --name glue_pyspark amazon/aws-glue-libs:5 pyspark
+
+debug:
+docker run -it -v C:\Users\RBR00100\.aws:/home/glue_user/.aws -v WORKSPACE_LOCATION:/home/glue_user/workspace/ -e AWS_PROFILE=lower -e DISABLE_SSL=true --rm -p 5678:5678 --name glue_pyspark amazon/aws-glue-libs:5 pyspark
+pip install debugpy
+cd /home/glue_user/workspace
+
+
+docker cp glue_pyspark:/home/glue_user/workspace/EpsComparison.py C:\SCDHHS\code-commit\bits-and-bobs\EPSComparisonToolReplacement\glue
+docker cp C:\SCDHHS\code-commit\bits-and-bobs\pytest-unitTest-poc\pytest-poc glue_pyspark:/home/glue_user/workspace
+
+
+
+
+How to run tests :
+1. go to /home/glue_user/workspace/pytest-poc
+2. run pytest -v
+
+
+CI/CD workflow in codebuild:
+AWS code build phases :
+
+ phases:
+  install:
+    runtime-versions:
+      python: 3.10
+    commands:
+      - pip install pytest
+      - docker pull amazon/aws-glue-libs:5
+
+  build:
+    commands:
+      - echo "Running Glue tests"
+      # CodeBuild clones your repo. run a Docker container from inside CodeBuild, you just need to mount the current working directory(with source code) into the Glue container.
+      - docker run --rm \
+          -v $(pwd):/home/glue_user/workspace \
+          amazon/aws-glue-libs:5 \
+          bash -c "cd /home/glue_user/workspace && pip install -e . && pytest -v"
+
+  post_build:
+    commands:
+

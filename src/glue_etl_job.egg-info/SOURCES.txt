@@ -1,0 +1,7 @@
+pyproject.toml
+setup.py
+src/glue_etl_job.egg-info/PKG-INFO
+src/glue_etl_job.egg-info/SOURCES.txt
+src/glue_etl_job.egg-info/dependency_links.txt
+src/glue_etl_job.egg-info/top_level.txt
+tests/test_etl_job.py
