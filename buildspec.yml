@@ -24,9 +24,14 @@ phases:
 
   build:
     commands:
+      - echo "Testing Docker availability..."
+      - docker ps
+      - docker run hello-world
+
       - echo "=== RUN TESTS INSIDE GLUE DOCKER ==="
       - >
-        docker run --rm -v "$CODEBUILD_SRC_DIR":/home/glue_user/workspace
+        docker run --rm --user root
+        -v "$CODEBUILD_SRC_DIR":/home/glue_user/workspace
         "$GLUE_IMAGE"
         bash -c "set -euo pipefail &&
         cd /home/glue_user/workspace &&
