@@ -23,7 +23,7 @@ AWS code build phases :
 
  phases:
   install:
-    runtime-versions:
+    runtime-versions:"
       python: 3.10
     commands:
       - pip install pytest

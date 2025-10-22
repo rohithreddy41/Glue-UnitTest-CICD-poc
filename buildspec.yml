@@ -1,0 +1,57 @@
+version: 0.2
+
+env:
+  variables:
+    GLUE_IMAGE: "amazon/aws-glue-libs:5"
+    WHEEL_BUCKET: "cicd-pytest-bucket"
+    GLUE_JOB_NAME: "CICD-glue-poc"
+    AUTO_DEPLOY: "false"
+
+phases:
+  install:
+    runtime-versions:
+      docker: 20
+      python: 3.10
+    commands:
+      - echo "Upgrading tooling..."
+      - pip install --upgrade pip setuptools wheel pytest
+
+  pre_build:
+    commands:
+      - echo "Source dir is: $CODEBUILD_SRC_DIR"
+      - ls -la
+
+  build:
+    commands:
+      - echo "***RUN TESTS INSIDE GLUE DOCKER***"
+      - docker run --rm \
+          -v "$CODEBUILD_SRC_DIR":/home/glue_user/workspace \
+          "$GLUE_IMAGE" \
+          bash -c "set -euo pipefail
+                   cd /home/glue_user/workspace
+                   rm -rf *.egg-info build dist || true
+                   pip install --upgrade pip setuptools wheel pytest
+                   pip install -e .
+                   pytest -v"
+      - echo "***PACKAGE WHEEL***"
+      - python setup.py sdist bdist_wheel
+      - ls -l dist/
+
+  post_build:
+    commands:
+      - echo "***UPLOAD WHEEL TO S3***"
+      - aws s3 cp dist/*.whl s3://$WHEEL_BUCKET/
+      - |
+        if [ "$AUTO_DEPLOY" = "true" ]; then
+          echo "=== UPDATE GLUE JOB TO NEW WHEEL ==="
+          WHEEL_URI=$(aws s3 ls s3://$WHEEL_BUCKET/ | awk '{print $4}' | sort | tail -n1)
+          aws glue update-job \
+            --job-name "$GLUE_JOB_NAME" \
+            --job-update "{\"DefaultArguments\": {\"--extra-py-files\": \"s3://$WHEEL_BUCKET/$WHEEL_URI\"}}"
+        else
+          echo "Auto deploy disabled; skipping glue update."
+        fi
+
+artifacts:
+  files:
+    - dist/*.whl
