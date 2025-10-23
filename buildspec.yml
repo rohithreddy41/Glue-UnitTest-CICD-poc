@@ -15,6 +15,10 @@ phases:
       - echo "=== [Pre-Build Phase] Checking Docker Environment ==="
       - docker --version
       - docker info
+      - echo "CodeBuild working directory: $CODEBUILD_SRC_DIR"
+      - echo "Listing top-level contents:"
+      - ls -la "$CODEBUILD_SRC_DIR"
+
   build:
     commands:
       - echo "=== [Build Phase] Running Glue container diagnostics ==="
