@@ -1,29 +1,20 @@
 ﻿---
 version: 0.2
-
 env:
   variables:
     GLUE_IMAGE: "public.ecr.aws/glue/aws-glue-libs:5"
-
 phases:
   install:
     runtime-versions:
       python: "3.10"
     commands:
       - echo "=== [Install Phase] ==="
-      - pip install --upgrade pip
-
   pre_build:
     commands:
       - echo "=== [Pre-Build Phase] Checking Docker Environment ==="
-      - echo "CodeBuild working directory: $CODEBUILD_SRC_DIR"
-      - echo "Listing top-level contents:"
-      - ls -la "$CODEBUILD_SRC_DIR"
-
   build:
     commands:
       - echo "=== [Build Phase] Running Glue container diagnostics ==="
-
   post_build:
     commands:
       - echo "=== [Post-Build Phase] Diagnostics complete ==="
