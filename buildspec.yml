@@ -1,8 +1,10 @@
 ﻿---
 version: 0.2
+
 env:
   variables:
     GLUE_IMAGE: "public.ecr.aws/glue/aws-glue-libs:5"
+
 phases:
   install:
     runtime-versions:
@@ -10,18 +12,43 @@ phases:
     commands:
       - echo "=== [Install Phase] ==="
       - pip install --upgrade pip
+
   pre_build:
     commands:
       - echo "=== [Pre-Build Phase] Checking Docker Environment ==="
       - docker --version
       - docker info
-      - echo "$CODEBUILD_SRC_DIR"
       - echo "Listing top-level contents:"
       - ls -la "$CODEBUILD_SRC_DIR"
 
   build:
     commands:
       - echo "=== [Build Phase] Running Glue container diagnostics ==="
+      - |
+        docker run --rm --user root --platform linux/amd64 \
+          -v "$CODEBUILD_SRC_DIR":/home/glue_user/workspace \
+          "$GLUE_IMAGE" \
+          bash -x -c "
+            echo '=== Inside Glue Container ===';
+            echo 'User:' \$(whoami);
+            echo 'Bash path:' \$(which bash || echo bash not found);
+            echo 'Check bash permissions:';
+            ls -l /bin/bash /usr/bin/bash 2>/dev/null || true;
+            echo 'Python version:'; python3 --version || true;
+            echo 'Java version:'; java -version || true;
+            echo 'Spark version:'; spark-submit --version || true;
+            echo 'Listing mounted workspace:';
+            ls -la /home/glue_user/workspace || true;
+            echo 'Print current directory:'; pwd;
+            echo 'Attempt to run a basic Python script:';
+            python3 - <<'EOF'
+              import os, sys
+              print('Python OK. cwd:', os.getcwd())
+              print('sys.executable:', sys.executable)
+              print('Directory contents:', os.listdir('.'))
+            EOF
+          "
+
   post_build:
     commands:
       - echo "=== [Post-Build Phase] Diagnostics complete ==="
