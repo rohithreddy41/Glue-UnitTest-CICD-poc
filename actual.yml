@@ -19,7 +19,7 @@ phases:
   pre_build:
     commands:
       - echo "Checking source directory..."
-      - echo "$CODEBUILD_SRC_DIR"
+      - echo "CODEBUILD_SRC_DIR=$CODEBUILD_SRC_DIR"
       - ls -la
 
   build:
@@ -29,6 +29,7 @@ phases:
         docker run --rm --user root
         -v "$CODEBUILD_SRC_DIR":/home/glue_user/workspace
         "$GLUE_IMAGE"
+        bash -c "set -euo pipefail &&
         cd /home/glue_user/workspace &&
         rm -rf *.egg-info build dist || true &&
         pip install -e . &&
