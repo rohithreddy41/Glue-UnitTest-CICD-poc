@@ -9,9 +9,12 @@ phases:
       python: "3.10"
     commands:
       - echo "=== [Install Phase] ==="
+      - pip install --upgrade pip
   pre_build:
     commands:
       - echo "=== [Pre-Build Phase] Checking Docker Environment ==="
+      - docker --version
+      - docker info
   build:
     commands:
       - echo "=== [Build Phase] Running Glue container diagnostics ==="
