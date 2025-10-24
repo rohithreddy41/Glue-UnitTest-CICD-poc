@@ -23,12 +23,12 @@ phases:
       - ls -la
       - echo "=== RUN DOCKER ==="
       - >
-          docker run
+          docker run -d
           -v "$CODEBUILD_SRC_DIR":/home/glue_user/workspace
           -e DISABLE_SSL=true --rm -p 4040:4040 -p 18080:18080
           --name glue_pyspark
           "$GLUE_IMAGE"
-          pyspark
+          tail -f /dev/null
       - echo "=== Wait for container to be up ==="
       - |
         for i in {1..10}; do

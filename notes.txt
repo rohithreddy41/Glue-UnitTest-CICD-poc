@@ -10,7 +10,7 @@ debug issues with code build :
 docker run --rm --user root -v "$(pwd)":/home/glue_user/workspace amazon/aws-glue-libs:5 bash -c "cd /home/glue_user/workspace && python3 --version && pytest -v"
 
 docker run -it -v "$CODEBUILD_SRC_DIR":/home/glue_user/workspace  -e DISABLE_SSL=true --rm -p 4040:4040 -p 18080:18080 --name glue_pyspark "$GLUE_IMAGE" pyspark
-docker run -it -v WORKSPACE_LOCATION:/home/glue_user/workspace  -e DISABLE_SSL=true --rm -p 4040:4040 -p 18080:18080 --name glue_pyspark amazon/aws-glue-libs:5 pyspark
+docker run -d  -v WORKSPACE_LOCATION:/home/glue_user/workspace  -e DISABLE_SSL=true --rm -p 4040:4040 -p 18080:18080 --name glue_pyspark amazon/aws-glue-libs:5 pyspark
 
 
 
