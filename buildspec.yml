@@ -25,10 +25,11 @@ phases:
       - >
           docker run -d
           -v "$CODEBUILD_SRC_DIR":/home/glue_user/workspace
-          -e DISABLE_SSL=true --rm -p 4040:4040 -p 18080:18080
+          -e DISABLE_SSL=true -p 4040:4040 -p 18080:18080
+          --entrypoint /bin/bash
           --name glue_pyspark
           "$GLUE_IMAGE"
-          tail -f /dev/null
+          -c "tail -f /dev/null"
       - echo "=== Wait for container to be up ==="
       - |
         for i in {1..10}; do
