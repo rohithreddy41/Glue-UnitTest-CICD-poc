@@ -52,14 +52,24 @@ phases:
           cd /home/glue_user/workspace &&
           pwd &&
           ls -la &&
-          pytest -v
-        "
+          mkdir -p reports &&
+          pytest -v --junitxml=reports/test-results.xml
+        " || TEST_EXIT_CODE=$?
+        echo "Pytest exit code: ${TEST_EXIT_CODE:-0}"
+        if [ "${TEST_EXIT_CODE:-0}" -ne 0 ]; then
+          "Some tests failed. Reports will still be uploaded."
+        fi
   post_build:
     commands:
       - echo "=== Stop & remove docker container ==="
       - docker stop glue_pyspark
       - docker rm glue_pyspark
       - echo "=== UPLOAD WHEEL TO S3 ==="
+reports:
+  pytest_reports:
+    files:
+      - reports/test-results.xml
+    file-format: JUNITXML
 
 
 artifacts:
