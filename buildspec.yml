@@ -46,14 +46,14 @@ phases:
       - echo "=== EXEC into DOCKER ==="
       - docker ps -a
       - docker inspect glue_pyspark
-      - docker exec glue_pyspark bash
-      - echo "=== SHOW PRESENT WORKING DIRECTORY ==="
-      - pwd
-      - cd /home/glue_user/workspace
-      - echo "=== SHOW PRESENT WORKING DIRECTORY ==="
-      - pwd
-      - ls -la
-      - pytest -v
+      - |
+        docker exec glue_pyspark bash -c "
+          pwd &&
+          cd /home/glue_user/workspace &&
+          pwd &&
+          ls -la &&
+          pytest -v
+        "
   post_build:
     commands:
       - echo "=== Stop & remove docker container ==="
