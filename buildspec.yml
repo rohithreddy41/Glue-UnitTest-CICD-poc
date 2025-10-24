@@ -3,7 +3,7 @@ version: 0.2
 
 env:
   variables:
-    GLUE_IMAGE: "public.ecr.aws/glue/aws-glue-libs:5"
+    GLUE_IMAGE: "amazon/aws-glue-libs:5"
     WHEEL_BUCKET: "cicd-pytest-bucket"
     GLUE_JOB_NAME: "CICD-glue-poc"
     AUTO_DEPLOY: "false"
