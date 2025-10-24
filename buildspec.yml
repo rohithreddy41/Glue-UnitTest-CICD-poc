@@ -21,37 +21,31 @@ phases:
       - echo "Checking source directory..."
       - echo "$CODEBUILD_SRC_DIR"
       - ls -la
+      - echo "=== RUN DOCKER ==="
+      - >
+          docker run --rm --user root
+          -v "$CODEBUILD_SRC_DIR":/home/glue_user/workspace
+          --name glue_pyspark
+          "$GLUE_IMAGE"
 
   build:
     commands:
-      - echo "=== RUN TESTS INSIDE GLUE DOCKER ==="
-      - >
-        docker run --rm --user root
-        -v "$CODEBUILD_SRC_DIR":/home/glue_user/workspace
-        --name glue_pyspark
-        "$GLUE_IMAGE"
+      - echo "=== EXEC into DOCKER ==="
+      - docker exec -it glue_pyspark bash
       - echo "=== SHOW PRESENT WORKING DIRECTORY ==="
       - pwd
       - cd /home/glue_user/workspace
       - echo "=== SHOW PRESENT WORKING DIRECTORY ==="
       - pwd
       - ls -la
+      - pytest -v
   post_build:
     commands:
+      - echo "=== Stop & remove docker container ==="
+      - docker stop glue_pyspark
+      - docker rm glue_pyspark
       - echo "=== UPLOAD WHEEL TO S3 ==="
-      - aws s3 cp dist/*.whl s3://$WHEEL_BUCKET/
-      - |
-        if [ "$AUTO_DEPLOY" = "true" ]; then
-          echo "=== UPDATE GLUE JOB ==="
-          WHEEL_URI=$(aws s3 ls s3://$WHEEL_BUCKET/ | awk '{print $4}' | \
-            sort | tail -n1)
-          aws glue update-job \
-            --job-name "$GLUE_JOB_NAME" \
-            --job-update "{\"DefaultArguments\": {\
-            \"--extra-py-files\": \"s3://$WHEEL_BUCKET/$WHEEL_URI\"}}"
-        else
-          echo "Auto-deploy disabled; skipping Glue job update."
-        fi
+
 
 artifacts:
   files:
