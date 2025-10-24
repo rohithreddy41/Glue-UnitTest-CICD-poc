@@ -27,11 +27,12 @@ phases:
           -v "$CODEBUILD_SRC_DIR":/home/glue_user/workspace
           --name glue_pyspark
           "$GLUE_IMAGE"
+          tail -f /dev/null
 
   build:
     commands:
       - echo "=== EXEC into DOCKER ==="
-      - docker exec -it glue_pyspark bash
+      - docker exec glue_pyspark bash
       - echo "=== SHOW PRESENT WORKING DIRECTORY ==="
       - pwd
       - cd /home/glue_user/workspace
