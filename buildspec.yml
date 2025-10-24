@@ -28,10 +28,20 @@ phases:
           --name glue_pyspark
           "$GLUE_IMAGE"
           tail -f /dev/null
-
+      - echo "=== Wait for container to be up ==="
+        - |
+          for i in {1..10}; do
+            if [ "$(docker ps -q -f name=glue_pyspark)" ]; then
+              echo "Container is running!"
+              break
+            fi
+              echo "Waiting for container..."
+              sleep 3
+          done
   build:
     commands:
       - echo "=== EXEC into DOCKER ==="
+      - docker ps -a
       - docker exec glue_pyspark bash
       - echo "=== SHOW PRESENT WORKING DIRECTORY ==="
       - pwd
