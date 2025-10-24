@@ -23,7 +23,7 @@ phases:
       - ls -la
       - echo "=== RUN DOCKER ==="
       - >
-          docker run -it
+          docker run
           -v "$CODEBUILD_SRC_DIR":/home/glue_user/workspace
           -e DISABLE_SSL=true --rm -p 4040:4040 -p 18080:18080
           --name glue_pyspark
@@ -44,7 +44,7 @@ phases:
     commands:
       - echo "=== EXEC into DOCKER ==="
       - docker ps -a
-      - docker exec -it glue_pyspark bash
+      - docker exec  glue_pyspark bash
       - echo "=== SHOW PRESENT WORKING DIRECTORY ==="
       - pwd
       - cd /home/glue_user/workspace
