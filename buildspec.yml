@@ -31,10 +31,10 @@ phases:
         --name glue_pyspark
         "$GLUE_IMAGE"
       - echo "=== SHOW PRESENT WORKING DIRECTORY ==="
-        echo "$PWD"
+        pwd
         cd /home/glue_user/workspace
       - echo "=== SHOW PRESENT WORKING DIRECTORY ==="
-        echo "$PWD"
+        pwd
   post_build:
     commands:
       - echo "=== UPLOAD WHEEL TO S3 ==="
