@@ -44,7 +44,8 @@ phases:
     commands:
       - echo "=== EXEC into DOCKER ==="
       - docker ps -a
-      - docker exec  glue_pyspark bash
+      - docker inspect glue_pyspark
+      - docker exec glue_pyspark bash
       - echo "=== SHOW PRESENT WORKING DIRECTORY ==="
       - pwd
       - cd /home/glue_user/workspace
