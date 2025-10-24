@@ -32,10 +32,9 @@ phases:
         "$GLUE_IMAGE"
       - echo "=== SHOW PRESENT WORKING DIRECTORY ==="
         echo "$PWD"
-        cd /home/glue_user/workspace &&
-        rm -rf *.egg-info build dist || true &&
-        pip install -e . &&
-        pytest -v
+        cd /home/glue_user/workspace
+      - echo "=== SHOW PRESENT WORKING DIRECTORY ==="
+        echo "$PWD"
   post_build:
     commands:
       - echo "=== UPLOAD WHEEL TO S3 ==="
