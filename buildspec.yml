@@ -29,9 +29,10 @@ phases:
         docker run --rm --user root
         -v "$CODEBUILD_SRC_DIR":/home/glue_user/workspace
         "$GLUE_IMAGE"
-        cd /home/glue_user/workspace
-        
-
+        cd /home/glue_user/workspace &&
+        rm -rf *.egg-info build dist || true &&
+        pip install -e . &&
+        pytest -v
   post_build:
     commands:
       - echo "=== UPLOAD WHEEL TO S3 ==="
