@@ -28,7 +28,10 @@ phases:
       - >
         docker run --rm --user root
         -v "$CODEBUILD_SRC_DIR":/home/glue_user/workspace
+        --name glue_pyspark
         "$GLUE_IMAGE"
+      - echo "=== SHOW PRESENT WORKING DIRECTORY ==="
+        echo "$PWD"
         cd /home/glue_user/workspace &&
         rm -rf *.egg-info build dist || true &&
         pip install -e . &&
