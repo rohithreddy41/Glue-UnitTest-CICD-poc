@@ -22,10 +22,12 @@ phases:
       - echo "$CODEBUILD_SRC_DIR"
       - ls -la
       - mkdir -p reports
+      - chmod 777 reports
       - echo "=== RUN DOCKER ==="
       - >
           docker run -d
           -v "$CODEBUILD_SRC_DIR":/home/glue_user/workspace
+          -v "$CODEBUILD_SRC_DIR/reports":/home/glue_user/workspace/reports
           -e DISABLE_SSL=true -p 4040:4040 -p 18080:18080
           --entrypoint /bin/bash
           --name glue_pyspark
