@@ -16,11 +16,9 @@ def spark():
     )
 
 def test_etl_workflow(spark, tmp_path):
-    # Run ETL
     output_path = str(tmp_path / "output")
     df_out = run_etl(spark, output_path)
 
-    # Collect results
     result = [(r["name"], r["age"], r["is_adult"]) for r in df_out.collect()]
 
     expected = [("ALICE", 17, False), ("BOB", 25, True)]
