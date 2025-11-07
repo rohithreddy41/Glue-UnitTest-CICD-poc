@@ -66,8 +66,8 @@ phases:
       - cd tests/integration
       - ls -la
       - |
-        pytest -v
-          --junitxml=/home/glue_user/workspace/reports/integration-test-results.xml
+        pytest -v \
+          --junitxml=/home/glue_user/workspace/reports/i-test-results.xml \
           || INTEGRATION_EXIT_CODE=$?
       - if [ "${INTEGRATION_EXIT_CODE:-0}" -ne 0 ]; then
           echo "Some integration tests failed. Reports will still be uploaded."
