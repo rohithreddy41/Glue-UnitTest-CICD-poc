@@ -51,7 +51,7 @@ phases:
       - |
         docker exec glue_pyspark bash -c "
           pwd &&
-          cd /home/glue_user/workspace/pysparkUnitTests &&
+          cd /home/glue_user/workspace/tests/pysparkUnitTests &&
           pwd &&
           ls -la &&
           pytest -v --junitxml=reports/test-results.xml
@@ -61,7 +61,7 @@ phases:
         echo "Some tests failed. Reports will still be uploaded."
         fi
       - echo "=== RUNNING integration tests on buildspec ==="
-      - cd integration
+      - cd tests/integration
       - ls -la
       - |
         pytest -v --junitxml=reports/integration-test-results.xml
