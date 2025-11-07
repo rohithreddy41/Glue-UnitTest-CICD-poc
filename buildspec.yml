@@ -51,6 +51,7 @@ phases:
       - |
         docker exec glue_pyspark bash -c "
           pwd &&
+          export PYTHONPATH=/home/glue_user/workspace &&
           cd /home/glue_user/workspace/tests/pysparkUnitTests &&
           pwd &&
           ls -la &&
