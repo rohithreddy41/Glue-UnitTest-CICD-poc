@@ -46,13 +46,12 @@ phases:
       - echo "=== container start up completed ==="
   build:
     commands:
-      - echo "=== EXEC into DOCKER ==="
+      - echo "=== EXEC into DOCKER for pysparkUnitTests ==="
       - docker ps -a
-      - docker inspect glue_pyspark
       - |
         docker exec glue_pyspark bash -c "
           pwd &&
-          cd /home/glue_user/workspace &&
+          cd /home/glue_user/workspace/pysparkUnitTests &&
           pwd &&
           ls -la &&
           pytest -v --junitxml=reports/test-results.xml
@@ -61,6 +60,16 @@ phases:
         if [ "${TEST_EXIT_CODE:-0}" -ne 0 ]; then
         echo "Some tests failed. Reports will still be uploaded."
         fi
+      - echo "=== RUNNING integration tests on buildspec ==="
+      - cd integration
+      - ls -la
+      - |
+        pytest -v --junitxml=reports/integration-test-results.xml
+          || INTEGRATION_EXIT_CODE=$?
+      - if [ "${INTEGRATION_EXIT_CODE:-0}" -ne 0 ]; then
+          echo "Some integration tests failed. Reports will still be uploaded."
+        fi
+
   post_build:
     commands:
       - echo "=== Stop & remove docker container ==="
