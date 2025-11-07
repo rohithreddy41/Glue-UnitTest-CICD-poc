@@ -11,10 +11,10 @@ env:
 phases:
   install:
     runtime-versions:
-      python: 3.10
+      python: 3.13
     commands:
       - echo "Upgrading pip and tools..."
-      - pip install --upgrade pip setuptools wheel pytest
+      - pip install --upgrade pip setuptools wheel pytest boto3
 
   pre_build:
     commands:
